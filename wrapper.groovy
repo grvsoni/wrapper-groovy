@@ -1,15 +1,16 @@
 // Wrapper script to run the demoScript shared library in standalone Groovy
 
-// Create a GroovyShell with a shared binding
-def binding = new Binding()
-def shell = new GroovyShell(binding)
+// First, evaluate the utility scripts in the current script's context
+Eval.me(new File('utils.groovy').text)
+Eval.me(new File('yaml_util.groovy').text)
 
-// Load utility scripts into the binding
-shell.evaluate(new File('utils.groovy').text)
-shell.evaluate(new File('yaml_util.groovy').text)
+// Load and parse demoScript as a class
+def demoScriptText = new File('demoScript.groovy').text
+GroovyShell shell = new GroovyShell(this.class.classLoader)
+Script demoScript = shell.parse(demoScriptText)
 
-// Load demoScript - this defines the call() method in the binding
-shell.evaluate(new File('demoScript.groovy').text)
+// Set the binding so demoScript can access utils and yaml_util
+demoScript.binding = this.binding
 
 // Get parameters from environment
 def team = System.getenv("TEAM") ?: "frontend"
@@ -26,23 +27,14 @@ if (customEnvironment) {
     customParams.environment = customEnvironment
 }
 
-// Put parameters into the binding so they're accessible in the shell
-binding.setVariable('team', team)
-binding.setVariable('suite', suite)
-binding.setVariable('test', test)
-binding.setVariable('customParams', customParams)
-
-// Call the demoScript via the shell's binding
+// Call the demoScript's call method
 try {
-    // Execute the call method through the shell
-    def result = shell.evaluate('''
-        call([
-            team: team,
-            suite: suite,
-            test: test,
-            customParams: customParams
-        ])
-    ''')
+    def result = demoScript.call([
+        team: team,
+        suite: suite,
+        test: test,
+        customParams: customParams
+    ])
     
     if (result && result.status) {
         println "✅ Demo script completed with status: ${result.status}"
