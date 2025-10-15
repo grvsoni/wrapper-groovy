@@ -3,10 +3,9 @@
 @Grab('org.yaml:snakeyaml:1.29')
 
 // Load utility scripts
-evaluate(new File('utils.groovy').getText())
-evaluate(new File('yaml_util.groovy').getText())
-evaluate(new File('demoScript.groovy').getText())
-
+new GroovyShell().evaluate(new File('utils.groovy'))
+new GroovyShell().evaluate(new File('yaml_util.groovy'))
+new GroovyShell().evaluate(new File('demoScript.groovy'))
 
 // Get parameters from environment
 def team = System.getenv("TEAM") ?: "frontend"
