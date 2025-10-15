@@ -1,9 +1,15 @@
 // Wrapper script to run the demoScript shared library in standalone Groovy
 
-// Load utility scripts by evaluating their content
-evaluate(new File('utils.groovy').text)
-evaluate(new File('yaml_util.groovy').text)
-evaluate(new File('demoScript.groovy').text)
+// Create a GroovyShell with a shared binding
+def binding = new Binding()
+def shell = new GroovyShell(binding)
+
+// Load utility scripts
+shell.evaluate(new File('utils.groovy').text)
+shell.evaluate(new File('yaml_util.groovy').text)
+
+// Load demoScript and get the script object
+def demoScriptObj = shell.evaluate(new File('demoScript.groovy').text)
 
 // Get parameters from environment
 def team = System.getenv("TEAM") ?: "frontend"
@@ -22,7 +28,7 @@ if (customEnvironment) {
 
 // Call the demoScript
 try {
-    def result = call([
+    def result = demoScriptObj.call([
         team: team,
         suite: suite,
         test: test,
@@ -35,5 +41,6 @@ try {
     }
 } catch (Exception e) {
     println "❌ Demo script execution failed: ${e.message}"
+    e.printStackTrace()
     System.exit(1)
 }
