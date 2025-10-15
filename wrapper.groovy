@@ -7,6 +7,10 @@ new GroovyShell().evaluate(new File('utils.groovy'))
 new GroovyShell().evaluate(new File('yaml_util.groovy'))
 new GroovyShell().evaluate(new File('demoScript.groovy'))
 
+// load('utils.groovy')
+// load('yaml_util.groovy')
+// load('demoScript.groovy')
+
 // Get parameters from environment
 def team = System.getenv("TEAM") ?: "frontend"
 def suite = System.getenv("SUITE") ?: "ui-tests"
