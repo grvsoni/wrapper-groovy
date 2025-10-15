@@ -1,8 +1,9 @@
 // Wrapper script to run the demoScript shared library in standalone Groovy
-// Load utility scripts
-load('utils.groovy')
-load('yaml_util.groovy')
-load('demoScript.groovy')
+
+// Load utility scripts by evaluating their content
+evaluate(new File('utils.groovy').text)
+evaluate(new File('yaml_util.groovy').text)
+evaluate(new File('demoScript.groovy').text)
 
 // Get parameters from environment
 def team = System.getenv("TEAM") ?: "frontend"
