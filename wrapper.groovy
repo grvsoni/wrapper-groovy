@@ -1,16 +1,22 @@
 // Wrapper script to run the demoScript shared library in standalone Groovy
 
-// First, evaluate the utility scripts in the current script's context
-Eval.me(new File('utils.groovy').text)
-Eval.me(new File('yaml_util.groovy').text)
+// Create a shared binding
+def binding = new Binding()
 
-// Load and parse demoScript as a class
+// Parse and instantiate utility scripts
+GroovyShell shell = new GroovyShell(binding)
+
+// Load utils.groovy and make it available as 'utils'
+def utilsScript = shell.parse(new File('utils.groovy'))
+binding.setVariable('utils', utilsScript)
+
+// Load yaml_util.groovy and make it available as 'yaml_util'
+def yamlUtilScript = shell.parse(new File('yaml_util.groovy'))
+binding.setVariable('yaml_util', yamlUtilScript)
+
+// Load and parse demoScript with the shared binding
 def demoScriptText = new File('demoScript.groovy').text
-GroovyShell shell = new GroovyShell(this.class.classLoader)
 Script demoScript = shell.parse(demoScriptText)
-
-// Set the binding so demoScript can access utils and yaml_util
-demoScript.binding = this.binding
 
 // Get parameters from environment
 def team = System.getenv("TEAM") ?: "frontend"
