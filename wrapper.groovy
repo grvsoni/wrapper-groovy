@@ -26,19 +26,23 @@ if (customEnvironment) {
     customParams.environment = customEnvironment
 }
 
+// Put parameters into the binding so they're accessible in the shell
+binding.setVariable('team', team)
+binding.setVariable('suite', suite)
+binding.setVariable('test', test)
+binding.setVariable('customParams', customParams)
+
 // Call the demoScript via the shell's binding
 try {
-    def params = [
-        team: team,
-        suite: suite,
-        test: test,
-        customParams: customParams
-    ]
-    
     // Execute the call method through the shell
-    def result = shell.evaluate("""
-        call(${groovy.json.JsonOutput.toJson(params)})
-    """)
+    def result = shell.evaluate('''
+        call([
+            team: team,
+            suite: suite,
+            test: test,
+            customParams: customParams
+        ])
+    ''')
     
     if (result && result.status) {
         println "✅ Demo script completed with status: ${result.status}"
